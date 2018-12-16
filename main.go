@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/twinj/uuid"
-
-	Data "guido.arkesteijn/quiz-server/data"
-	Question "guido.arkesteijn/quiz-server/data/Question"
+	Data "guido.arkesteijn/quiz-server/TempData"
+	Question "guido.arkesteijn/quiz-server/TempData/Question"
 )
 
 func main() {
