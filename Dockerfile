@@ -12,7 +12,7 @@ COPY . $GOPATH/src/guido.arkesteijn/quiz-server/
 WORKDIR $GOPATH/src/guido.arkesteijn/quiz-server/
 # Fetch dependencies.
 # Using go get.
-RUN go get -d -v
+RUN go get github.com/twinj/uuid 
 # Using go mod.
 # RUN go mod download
 # Build the binary
