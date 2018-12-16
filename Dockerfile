@@ -13,6 +13,7 @@ WORKDIR $GOPATH/src/guido.arkesteijn/quiz-server/
 # Fetch dependencies.
 # Using go get.
 RUN go get github.com/twinj/uuid 
+RUN go get github.com/golang/protobuf/proto
 # Using go mod.
 # RUN go mod download
 # Build the binary
