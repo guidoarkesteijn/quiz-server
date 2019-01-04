@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"net"
-	"strings"
 
 	BaseMessage "guido.arkesteijn/quiz-server/Data"
 	Player "guido.arkesteijn/quiz-server/Data/Player"
+	Welcome "guido.arkesteijn/quiz-server/Data/Welcome"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
 	"github.com/twinj/uuid"
 )
@@ -44,20 +45,33 @@ func Read(index int, connection Connection) {
 
 	for {
 		fmt.Println("start reading welcome message.")
-		netData, err := bufio.NewReader(c).ReadString('\n')
+
+		//TODO get an idea for which byte I need to delimit for.
+		bytes, err := bufio.NewReader(c).ReadBytes(114)
+
 		if err != nil {
-			fmt.Println("reading error " + err.Error())
-			return
-		}
+			fmt.Println("Error Reading all" + err.Error())
+		} else {
+			var m BaseMessage.BaseMessage
 
-		temp := strings.TrimSpace(string(netData))
-		fmt.Println("Received: " + temp)
-		if temp == "STOP" {
-			break
-		}
+			fmt.Println(len(bytes))
 
-		//Only write to the client that is connecting.
-		WriteSingle(index, &Player.PlayerJoined{Id: int32(index), Player: &connection.player})
+			err := proto.Unmarshal(bytes, &m)
+
+			welcome := Welcome.Welcome{}
+			err2 := ptypes.UnmarshalAny(m.Message, &welcome)
+
+			if err != nil || err2 != nil {
+				fmt.Println(err.Error())
+			} else {
+				fmt.Println("nickname: " + welcome.Nickname)
+
+				p := connection.player
+				p.Nickname = welcome.Nickname
+				//Only write to the client that is connecting.
+				WriteSingle(index, &Player.PlayerJoined{Id: int32(index), Player: &connection.player})
+			}
+		}
 	}
 
 	RemoveConnection(index)
@@ -92,8 +106,7 @@ func WriteWithIndex(index int, messageIndex int32, message proto.Message) {
 		Value:   serialized,
 	}
 
-	typeInt := GetIntForString(name)
-	baseMessage := BaseMessage.BaseMessage{Id: messageIndex, Message: anything, Type: typeInt}
+	baseMessage := BaseMessage.BaseMessage{Id: messageIndex, Message: anything}
 	bytes, seconderr := proto.Marshal(&baseMessage)
 
 	if seconderr != nil {
@@ -117,14 +130,4 @@ func RemoveAt(a []Connection, i int) []Connection {
 	a[len(a)-1] = Connection{Player.Player{}, -1, false, nil} // Erase last element (write zero value).
 	a = a[:len(a)-1]                                          // Truncate slice.
 	return a
-}
-
-func GetIntForString(t string) int32 {
-	stringToInt = make(map[string]int)
-
-	stringToInt["Data.Joined"] = 1
-
-	fmt.Sprintln("TEST ", stringToInt[t])
-
-	return int32(stringToInt[t])
 }
