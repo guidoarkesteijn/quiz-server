@@ -67,6 +67,7 @@ func Read(index int, connection Connection) {
 
 			err := proto.Unmarshal(changedBytes, &m)
 
+			//TODO decode the correct message found by looking at the m.Message.TypeUrl.
 			welcome := Welcome.Welcome{}
 			err2 := ptypes.UnmarshalAny(m.Message, &welcome)
 
