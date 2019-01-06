@@ -22,16 +22,14 @@ type Connection struct {
 	con    net.Conn
 }
 
-var connections []Connection
 var i = 0
 var messageCount int32 = 1
 
-var stringToInt map[string]int
-
 func HandleConnection(c net.Conn) {
-	player := Player.Player{Guid: uuid.NewV4().String()}
+	player := Player.Player{Guid: uuid.NewV4().String(), Nickname: "<UNKNOWN>"}
 	connection := Connection{player, i, true, c}
-	connections = append(connections, connection)
+
+	connectionMap[i] = connection
 	go Read(i, connection)
 
 	fmt.Println("Added connection number:" + fmt.Sprintf("%d", connection.Index))
@@ -51,6 +49,7 @@ func Read(index int, connection Connection) {
 
 		if err != nil {
 			fmt.Println("Error Reading all" + err.Error())
+			break
 		} else {
 			var m BaseMessage.BaseMessage
 
@@ -65,15 +64,16 @@ func Read(index int, connection Connection) {
 				fmt.Println(err.Error())
 			} else {
 				fmt.Println("nickname: " + welcome.Nickname)
-
 				p := connection.player
 				p.Nickname = welcome.Nickname
+
 				//Only write to the client that is connecting.
 				WriteSingle(index, &Player.PlayerJoined{Id: int32(index), Player: &connection.player})
 			}
 		}
 	}
 
+	fmt.Println("Close connection and remove from connection list :")
 	RemoveConnection(index)
 	c.Close()
 }
@@ -117,17 +117,9 @@ func WriteWithIndex(index int, messageIndex int32, message proto.Message) {
 
 		len(bytes)))
 	fmt.Println(fmt.Sprintln("Writing to ", index))
-	connections[index].con.Write(bytes)
+	connectionMap[index].con.Write(bytes)
 }
 
 func RemoveConnection(index int) {
-	connections = RemoveAt(connections, index)
-}
-
-func RemoveAt(a []Connection, i int) []Connection {
-	// Remove the element at index i from a.
-	copy(a[i:], a[i+1:])                                      // Shift a[i+1:] left one index.
-	a[len(a)-1] = Connection{Player.Player{}, -1, false, nil} // Erase last element (write zero value).
-	a = a[:len(a)-1]                                          // Truncate slice.
-	return a
+	delete(connectionMap, index)
 }

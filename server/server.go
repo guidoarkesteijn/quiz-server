@@ -5,10 +5,11 @@ import (
 	"net"
 )
 
-var letters = []string{"a", "b", "c", "d", "etc"}
+var connectionMap map[int]Connection
 
 func StartServer(port int) {
 	fmt.Println("Starting server")
+	connectionMap = make(map[int]Connection)
 
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 
