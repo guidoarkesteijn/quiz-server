@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	Question "guido.arkesteijn/quiz-server/Data/Question"
+
 	//Use _ because it is needed for mysql driver to be imported.
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -47,12 +49,15 @@ func (service *DatabaseService) GetQuestion(guid string) {
 	}
 }
 
-func (service *DatabaseService) GetQuestions() {
-	Result, errDB := service.database.Query("SELECT guid,text FROM questions")
+//GetQuestions Get all questions from the database.
+func (service *DatabaseService) GetQuestions() (questions []Question.Question, err error) {
+	Result, err := service.database.Query("SELECT guid,text FROM questions")
 
-	if errDB != nil {
-		fmt.Println("Error" + errDB.Error())
+	if err != nil {
+		fmt.Println("Question error: " + err.Error())
 	}
+
+	q := []Question.Question{}
 
 	for Result.Next() {
 		var (
@@ -63,6 +68,35 @@ func (service *DatabaseService) GetQuestions() {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("guid %s question is %s\n", guid, text)
+		a, answerErr := service.GetAnswers(guid)
+
+		if answerErr != nil {
+			fmt.Println("Answer err for question " + guid + ": " + answerErr.Error())
+		}
+
+		question := Question.Question{Guid: guid, Question: text, Answers: a}
+		q = append(q, question)
 	}
+
+	return q, err
+}
+
+func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*Question.Answer, err error) {
+	Result, err := service.database.Query("SELECT guid,answer FROM answers WHERE question='" + questionGuid + "'")
+
+	a := []*Question.Answer{}
+
+	for Result.Next() {
+		var (
+			guid   string
+			answer string
+		)
+		if err := Result.Scan(&guid, &answer); err != nil {
+			log.Fatal(err)
+		}
+		obj := Question.Answer{Guid: guid, Text: answer}
+
+		a = append(a, &obj)
+	}
+	return a, err
 }

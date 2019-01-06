@@ -17,8 +17,19 @@ func main() {
 		fmt.Printf("error", err.Error())
 	}
 
-	srv.GetQuestions()
-	srv.GetQuestion("test")
+	questions, questionErr := srv.GetQuestions()
+
+	if questionErr != nil {
+		fmt.Println("Error : " + questionErr.Error())
+	}
+
+	for _, element := range questions {
+		fmt.Println("Question:", element.Question)
+		fmt.Println("Answers:")
+		for _, answer := range element.Answers {
+			fmt.Println(answer.Text)
+		}
+	}
 
 	go server.StartServer(4500)
 
