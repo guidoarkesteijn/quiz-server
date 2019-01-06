@@ -45,27 +45,39 @@ func Read(index int, connection Connection) {
 		fmt.Println("start reading welcome message.")
 
 		//TODO get an idea for which byte I need to delimit for.
-		bytes, err := bufio.NewReader(c).ReadBytes(114)
+		bytes, err := bufio.NewReader(c).ReadBytes(0)
 
 		if err != nil {
-			fmt.Println("Error Reading all" + err.Error())
+			fmt.Println("Error Reading: " + err.Error())
 			break
 		} else {
 			var m BaseMessage.BaseMessage
 
-			fmt.Println(len(bytes))
+			fmt.Println("len", len(bytes))
 
-			err := proto.Unmarshal(bytes, &m)
+			i := len(bytes) - 1
+
+			fmt.Println("i", i)
+
+			changedBytes := make([]byte, i)
+
+			for index := range changedBytes {
+				changedBytes[index] = bytes[index]
+			}
+
+			err := proto.Unmarshal(changedBytes, &m)
 
 			welcome := Welcome.Welcome{}
 			err2 := ptypes.UnmarshalAny(m.Message, &welcome)
 
 			if err != nil || err2 != nil {
-				fmt.Println(err.Error())
+				fmt.Println(err2.Error())
 			} else {
 				fmt.Println("nickname: " + welcome.Nickname)
-				p := connection.player
+				p := &connection.player
 				p.Nickname = welcome.Nickname
+
+				fmt.Println("nickname: " + p.Nickname)
 
 				//Only write to the client that is connecting.
 				WriteSingle(index, &Player.PlayerJoined{Id: int32(index), Player: &connection.player})
