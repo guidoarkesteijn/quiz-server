@@ -14,6 +14,7 @@ WORKDIR $GOPATH/src/guido.arkesteijn/quiz-server/
 # Using go get.
 RUN go get github.com/twinj/uuid 
 RUN go get github.com/golang/protobuf/proto
+RUN go get github.com/go-sql-driver/mysql
 # Using go mod.
 # RUN go mod download
 # Build the binary
