@@ -14,13 +14,13 @@ func main() {
 	srv, err := database.Connect("192.168.2.18", "4600")
 
 	if err != nil {
-		fmt.Printf("error", err.Error())
+		fmt.Println("error: ", err.Error())
 	}
 
 	questions, questionErr := srv.GetQuestions()
 
 	if questionErr != nil {
-		fmt.Println("Error : " + questionErr.Error())
+		fmt.Println("error: " + questionErr.Error())
 	}
 
 	for _, element := range questions {

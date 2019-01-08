@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net"
 
-	BaseMessage "guido.arkesteijn/quiz-server/Data"
-	Player "guido.arkesteijn/quiz-server/Data/Player"
-	Welcome "guido.arkesteijn/quiz-server/Data/Welcome"
+	//TODO: Find the correct use of packages so I don't need to specify the type before the github link.
+	BaseMessage "github.com/project-quiz/quiz-go-model"
+	Player "github.com/project-quiz/quiz-go-model/Player"
+	Welcome "github.com/project-quiz/quiz-go-model/Welcome"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"

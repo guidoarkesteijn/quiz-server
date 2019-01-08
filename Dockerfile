@@ -8,13 +8,15 @@ FROM golang:alpine as builder
 RUN apk update && apk add --no-cache git ca-certificates
 # Create appuser
 RUN adduser -D -g '' appuser
-COPY . $GOPATH/src/guido.arkesteijn/quiz-server/
-WORKDIR $GOPATH/src/guido.arkesteijn/quiz-server/
+COPY . $GOPATH/src/guidoarkesteijn/quiz-server/
+WORKDIR $GOPATH/src/guidoarkesteijn/quiz-server/
 # Fetch dependencies.
 # Using go get.
+# TODO find a way to get all my dependencies in one go command.
 RUN go get github.com/twinj/uuid 
 RUN go get github.com/golang/protobuf/proto
 RUN go get github.com/go-sql-driver/mysql
+RUN go get github.com/project-quiz/quiz-go-model
 # Using go mod.
 # RUN go mod download
 # Build the binary

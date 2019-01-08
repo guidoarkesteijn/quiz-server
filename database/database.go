@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	Question "guido.arkesteijn/quiz-server/Data/Question"
+	Question "github.com/project-quiz/quiz-go-model/Question"
 
 	//Use _ because it is needed for mysql driver to be imported.
 	_ "github.com/go-sql-driver/mysql"
@@ -17,6 +17,7 @@ type DatabaseService struct {
 
 //Connect connect with the questions database.
 func Connect(ip string, port string) (*DatabaseService, error) {
+	////TODO: Find a way to implement variables so I don't need to post my username/password of my mariadb server.
 	db, err := sql.Open("mysql", "root:RrDLvT70IHAV@tcp("+ip+":"+port+")/quiz")
 
 	if err != nil {
