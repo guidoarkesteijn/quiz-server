@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"guido.arkesteijn/quiz-server/database"
-	"guido.arkesteijn/quiz-server/server"
+	"guidoarkesteijn/quiz-server/database"
+	"guidoarkesteijn/quiz-server/server"
 )
 
 var messageID int32 = 1
