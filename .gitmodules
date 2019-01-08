@@ -1,3 +1,0 @@
-[submodule "Data"]
-	path = Data
-	url = git@bitbucket.org:bgjinc/quiz-go-model.git
