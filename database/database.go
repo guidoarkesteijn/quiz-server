@@ -18,7 +18,7 @@ type DatabaseService struct {
 }
 
 //Connect connect with the questions database.
-func Connect(ip string, port string) (*DatabaseService, error) {
+func Connect() (*DatabaseService, error) {
 	ip, ipSuccess := os.LookupEnv("DATABASE_IP")
 	port, portSuccess := os.LookupEnv("DATABASE_PORT")
 	username, usernameSuccess := os.LookupEnv("DATABASE_USERNAME")
