@@ -31,9 +31,6 @@ func Connect() (*DatabaseService, error) {
 	}
 
 	connection := username + ":" + password + "@tcp(" + ip + ":" + port + ")/quiz"
-
-	fmt.Println(connection)
-
 	db, err := sql.Open("mysql", connection)
 
 	if err != nil {
