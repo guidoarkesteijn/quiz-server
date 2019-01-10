@@ -2,8 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
+	"os"
 
 	Question "github.com/project-quiz/quiz-go-model/Question"
 
@@ -17,8 +19,18 @@ type DatabaseService struct {
 
 //Connect connect with the questions database.
 func Connect(ip string, port string) (*DatabaseService, error) {
-	////TODO: Find a way to implement variables so I don't need to post my username/password of my mariadb server.
-	db, err := sql.Open("mysql", "root:RrDLvT70IHAV@tcp("+ip+":"+port+")/quiz")
+	ip, ipSuccess := os.LookupEnv("DATABASE_IP")
+	port, portSuccess := os.LookupEnv("DATABASE_PORT")
+	username, usernameSuccess := os.LookupEnv("DATABASE_USERNAME")
+	password, passwordSuccess := os.LookupEnv("DATABASE_PASSWORD")
+
+	success := ipSuccess && portSuccess && usernameSuccess && passwordSuccess
+
+	if !success {
+		return nil, errors.New("not enough database values available")
+	}
+
+	db, err := sql.Open("mysql", username+":"+password+"@tcp("+ip+":"+port+")/quiz")
 
 	if err != nil {
 		fmt.Println("err" + err.Error())
