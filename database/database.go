@@ -30,7 +30,11 @@ func Connect() (*DatabaseService, error) {
 		return nil, errors.New("not enough database values available")
 	}
 
-	db, err := sql.Open("mysql", username+":"+password+"@tcp("+ip+":"+port+")/quiz")
+	connection := username + ":" + password + "@tcp(" + ip + ":" + port + ")/quiz"
+
+	fmt.Println(connection)
+
+	db, err := sql.Open("mysql", connection)
 
 	if err != nil {
 		fmt.Println("err" + err.Error())
