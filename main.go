@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"guidoarkesteijn/quiz-server/database"
 	"guidoarkesteijn/quiz-server/server"
@@ -11,6 +12,20 @@ var messageID int32 = 1
 var stopServer bool = false
 
 func main() {
+	for _, element := range os.Environ() {
+		fmt.Println(element)
+	}
+
+	password, success := os.LookupEnv("DATABASE_PASSWORD")
+
+	if success {
+		fmt.Println("Password=", password)
+	} else {
+		fmt.Print("no password set")
+	}
+
+	return
+
 	srv, err := database.Connect("192.168.2.18", "4600")
 
 	if err != nil {
