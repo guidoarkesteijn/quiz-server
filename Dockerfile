@@ -8,8 +8,8 @@ FROM golang:alpine as builder
 RUN apk update && apk add --no-cache git ca-certificates
 # Create appuser
 RUN adduser -D -g '' appuser
-COPY . $GOPATH/src/guidoarkesteijn/quiz-server/
-WORKDIR $GOPATH/src/guidoarkesteijn/quiz-server/
+COPY . $GOPATH/src/project-quiz/quiz-server/
+WORKDIR $GOPATH/src/project-quiz/quiz-server/
 # Fetch dependencies.
 # Using go get.
 # TODO find a way to get all my dependencies in one go command.
