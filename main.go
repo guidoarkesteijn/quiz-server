@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/project-quiz/quiz-server/database"
 	"github.com/project-quiz/quiz-server/server"
 )
@@ -39,29 +38,4 @@ func main() {
 			break
 		}
 	}
-}
-
-func (channels *channels) sendMessage(typeurl string, bytes []byte) {
-
-	switch typeurl {
-	case "Data.PlayerJoin":
-		player := Player.PlayerJoin{}
-		err := proto.Unmarshal(bytes, &player)
-		fmt.Println("error:", err)
-		fmt.Println("message:", player)
-		channels.PlayerJoining <- player
-	case "Data.Question":
-		break
-	}
-}
-
-type channels struct {
-	PlayerJoining chan Players.PlayerJoin
-}
-
-func CreateChannels() (c channels) {
-	channel := channels{}
-	channel.PlayerJoining = make(chan Player.PlayerJoin, 0)
-
-	return c
 }
