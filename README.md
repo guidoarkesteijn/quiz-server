@@ -1,4 +1,5 @@
 # Quiz Server
 
-## Enviorment Variables Needed to Run
-### Use MySQL server.
+## MYSQL Database
+This server app uses an MySQL database to store the different questions and answers.
+When you run the docker you can define the four environment variables needed to use MYSQL server.
