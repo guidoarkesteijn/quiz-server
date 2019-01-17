@@ -1,29 +1,25 @@
 package game
 
 import (
-	main "project-quiz/quiz-server/main"
+	"fmt"
+
+	Data "github.com/project-quiz/quiz-go-model/Player"
 )
 
-type game struct {
-	players string
+type Game struct {
+	PlayerJoined chan Data.PlayerJoin
+	Players      []Data.Player
 }
 
-//Create Do stuff
-func Create() (g game) {
-	g := game{}
+//New Create new game
+func New() (g Game) {
+	g = Game{}
 	return g
 }
 
-//Join join a created game.
-func (g *game) Join() {
-
-}
-
-func (g *game) AddPlayer(ch main.channels) {
-
-}
-
-//Start do stuff
-func Start() {
-
+//ListenToJoin join a created game.
+func (g *Game) listenToJoin() {
+	fmt.Println("Waiting for player")
+	p := <-g.PlayerJoined
+	fmt.Println(p.Nickname)
 }

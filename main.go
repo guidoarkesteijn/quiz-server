@@ -4,11 +4,10 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-	Player "github.com/project-quiz/quiz-go-model/Player"
-
-	"guidoarkesteijn/quiz-server/database"
-	"guidoarkesteijn/quiz-server/game"
-	"guidoarkesteijn/quiz-server/server"
+	"github.com/project-quiz/quiz-go-model/quizmodel"
+	"github.com/project-quiz/quiz-server/database"
+	"github.com/project-quiz/quiz-server/game"
+	"github.com/project-quiz/quiz-server/server"
 )
 
 var messageID int32 = 1
@@ -20,13 +19,13 @@ func main() {
 
 	playerJoin := <-channels.PlayerJoining
 
-	g := game.Create()
+	g := game.New()
 
-	g.AddPlayer(channels)
+	quizmodel.PlayerJoin
 
 	fmt.Println(playerJoin)
 
-	w := Player.PlayerJoin{Nickname: "wdowadmawdo"}
+	w := Players.PlayerJoin{Nickname: "wdowadmawdo"}
 
 	n := proto.MessageName(&w)
 
@@ -78,7 +77,7 @@ func (channels *channels) sendMessage(typeurl string, bytes []byte) {
 }
 
 type channels struct {
-	PlayerJoining chan Player.PlayerJoin
+	PlayerJoining chan Players.PlayerJoin
 }
 
 func CreateChannels() (c channels) {
