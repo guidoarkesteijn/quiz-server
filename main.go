@@ -4,9 +4,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/project-quiz/quiz-go-model/quizmodel"
 	"github.com/project-quiz/quiz-server/database"
-	"github.com/project-quiz/quiz-server/game"
 	"github.com/project-quiz/quiz-server/server"
 )
 
@@ -14,25 +12,6 @@ var messageID int32 = 1
 var stopServer bool = false
 
 func main() {
-
-	channels := CreateChannels()
-
-	playerJoin := <-channels.PlayerJoining
-
-	g := game.New()
-
-	quizmodel.PlayerJoin
-
-	fmt.Println(playerJoin)
-
-	w := Players.PlayerJoin{Nickname: "wdowadmawdo"}
-
-	n := proto.MessageName(&w)
-
-	bytes, _ := proto.Marshal(&w)
-
-	return
-
 	srv, err := database.Connect()
 
 	if err != nil {
