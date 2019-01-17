@@ -53,36 +53,24 @@ func Read(index int, connection Connection) {
 			break
 		} else {
 			var m BaseMessage.BaseMessage
-
-			fmt.Println("len", len(bytes))
-
-			i := len(bytes) - 1
-
-			fmt.Println("i", i)
-
-			changedBytes := make([]byte, i)
-
-			for index := range changedBytes {
-				changedBytes[index] = bytes[index]
-			}
+			changedBytes := bytes[0 : len(bytes)-1]
 
 			err := proto.Unmarshal(changedBytes, &m)
 
 			//TODO decode the correct message found by looking at the m.Message.TypeUrl.
-			welcome := Welcome.Welcome{}
-			err2 := ptypes.UnmarshalAny(m.Message, &welcome)
+			fmt.Println(proto.MessageType(m.Message.TypeUrl))
+
+			playerJoin := Player.PlayerJoin{}
+			err2 := ptypes.UnmarshalAny(m.Message, &playerJoin)
 
 			if err != nil || err2 != nil {
 				fmt.Println(err2.Error())
 			} else {
-				fmt.Println("nickname: " + welcome.Nickname)
 				p := &connection.player
-				p.Nickname = welcome.Nickname
-
-				fmt.Println("nickname: " + p.Nickname)
+				p.Nickname = playerJoin.Nickname
 
 				//Only write to the client that is connecting.
-				WriteSingle(index, &Player.PlayerJoined{Id: int32(index), Player: &connection.player})
+				WriteSingle(index, &Welcome.Welcome{Player: &connection.player})
 			}
 		}
 	}

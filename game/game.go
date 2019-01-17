@@ -1,16 +1,25 @@
 package game
 
+import (
+	main "project-quiz/quiz-server/main"
+)
+
 type game struct {
 	players string
 }
 
 //Create Do stuff
-func Create() {
-
+func Create() (g game) {
+	g := game{}
+	return g
 }
 
 //Join join a created game.
-func Join() {
+func (g *game) Join() {
+
+}
+
+func (g *game) AddPlayer(ch main.channels) {
 
 }
 
