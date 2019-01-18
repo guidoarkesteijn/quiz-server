@@ -9,7 +9,7 @@ import (
 
 	//Use _ because it is needed for mysql driver to be imported.
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/project-quiz/quiz-go-model/question"
+	question "github.com/project-quiz/quiz-go-model/Question"
 )
 
 type DatabaseService struct {
