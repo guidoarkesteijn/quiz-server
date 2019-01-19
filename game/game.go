@@ -3,12 +3,12 @@ package game
 import (
 	"fmt"
 
-	Data "github.com/project-quiz/quiz-go-model/Player"
+	model "github.com/project-quiz/quiz-go-model"
 )
 
 type Game struct {
-	PlayerJoined chan Data.PlayerJoin
-	Players      []Data.Player
+	PlayerJoined chan model.PlayerJoin
+	Players      []model.Player
 }
 
 //New Create new game
@@ -18,7 +18,7 @@ func New() (g Game) {
 }
 
 //ListenToJoin join a created game.
-func (g *Game) listenToJoin() {
+func (g *Game) ListenToJoin() {
 	fmt.Println("Waiting for player")
 	p := <-g.PlayerJoined
 	fmt.Println(p.Nickname)
