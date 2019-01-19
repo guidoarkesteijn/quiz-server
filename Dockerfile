@@ -12,11 +12,7 @@ COPY . $GOPATH/src/github.com/project-quiz/quiz-server/
 WORKDIR $GOPATH/src/github.com/project-quiz/quiz-server/
 # Fetch dependencies.
 # Using go get.
-# TODO find a way to get all my dependencies in one go command.
-RUN go get github.com/twinj/uuid 
-RUN go get github.com/golang/protobuf/proto
-RUN go get github.com/go-sql-driver/mysql
-RUN go get github.com/project-quiz/quiz-go-model
+RUN go get
 # Using go mod.
 # RUN go mod download
 # Build the binary

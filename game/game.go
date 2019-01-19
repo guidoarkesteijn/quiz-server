@@ -3,7 +3,7 @@ package game
 import (
 	"fmt"
 
-	model "github.com/project-quiz/quiz-go-model"
+	"github.com/project-quiz/quiz-go-model/model"
 )
 
 type Game struct {

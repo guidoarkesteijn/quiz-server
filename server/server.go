@@ -39,13 +39,14 @@ func (s *ServerService) Start(port int) {
 			fmt.Println(err)
 			return
 		}
-		go s.WaitForRead()
+		s.connected = true
+		go s.WaitForMessage()
 		HandleConnection(s, c)
 	}
 }
 
-//WaitForRead test function to see how channels work.
-func (s *ServerService) WaitForRead() {
+//WaitForMessage test function to see how channels work.
+func (s *ServerService) WaitForMessage() {
 	fmt.Println("Waiting for value")
 	value := <-s.onMessageReceived
 
