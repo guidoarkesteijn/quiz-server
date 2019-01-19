@@ -7,16 +7,15 @@ import (
 	"github.com/project-quiz/quiz-server/server"
 )
 
-var messageID int32 = 1
-var stopServer bool = false
+var stop bool
 
 func main() {
-	srv, err := database.Connect()
+	db, err := database.New()
 
 	if err != nil {
 		fmt.Println("error: ", err.Error())
 	} else {
-		questions, questionErr := srv.GetQuestions()
+		questions, questionErr := db.GetQuestions()
 
 		if questionErr != nil {
 			fmt.Println("error: " + questionErr.Error())
@@ -31,10 +30,11 @@ func main() {
 		}
 	}
 
-	go server.StartServer(4500)
+	server := server.New()
+	go server.Start(4500)
 
 	for {
-		if stopServer {
+		if stop {
 			break
 		}
 	}
