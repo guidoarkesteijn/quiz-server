@@ -113,3 +113,26 @@ func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*mode
 	}
 	return a, err
 }
+
+//TestDBCon function is to test if the connection is succesfull.
+func (service *DatabaseService) TestDBCon(err error) {
+
+	if err != nil {
+		fmt.Println("error: ", err.Error())
+	} else {
+		questions, questionErr := service.GetQuestions()
+
+		if questionErr != nil {
+			fmt.Println("error: " + questionErr.Error())
+		}
+
+		for _, element := range questions {
+			fmt.Println("Question:", element.Question)
+			fmt.Println("Answers:")
+			for _, answer := range element.Answers {
+				fmt.Println(answer.Text)
+			}
+		}
+	}
+
+}

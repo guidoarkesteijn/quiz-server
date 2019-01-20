@@ -13,6 +13,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
+//Connection this contains the data for an existing connection.
 type Connection struct {
 	player model.Player
 	Index  int
@@ -23,7 +24,8 @@ type Connection struct {
 var i = 0
 var messageCount int32 = 1
 
-func HandleConnection(server *ServerService, c net.Conn) {
+//HandleConnection handle incoming connection.
+func HandleConnection(server *Service, c net.Conn) {
 	player := model.Player{Guid: uuid.NewV4().String(), Nickname: "<UNKNOWN>"}
 	connection := Connection{player, i, true, c}
 
@@ -34,22 +36,15 @@ func HandleConnection(server *ServerService, c net.Conn) {
 	i++
 }
 
-func WaitForRead(message chan int) {
-	fmt.Println("Waiting for message value.")
-
-	value := <-message
-
-	fmt.Println("Message value: ", value)
-}
-
-func Read(index int, server *ServerService, connection Connection) {
+//Read reading from the connection.
+func Read(index int, server *Service, connection Connection) {
 	c := connection.con
 
 	fmt.Printf("Serving %s\n", c.RemoteAddr().String())
 
 	reader := bufio.NewReader(c)
 	scanner := bufio.NewScanner(reader)
-	scanner.Split(ScanCRLF)
+	scanner.Split(scanCRLF)
 
 	for scanner.Scan() {
 		bytes := scanner.Bytes()
@@ -79,7 +74,7 @@ func Read(index int, server *ServerService, connection Connection) {
 	c.Close()
 }
 
-func ScanCRLF(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func scanCRLF(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	skipBytes := []byte{'[', 'E', 'N', 'D', ']'}
 
 	if atEOF && len(data) == 0 {

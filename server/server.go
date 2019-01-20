@@ -7,18 +7,19 @@ import (
 
 var connectionMap map[int]Connection
 
-type ServerService struct {
+//Service this service contains all code to start an tcp server on the given port create with server.New() and then call func start with port to start it.
+type Service struct {
 	connected         bool
 	onMessageReceived chan int
 }
 
 //New create new server service with onMessageReceived channel
-func New() ServerService {
-	return ServerService{onMessageReceived: make(chan int, 10)}
+func New() Service {
+	return Service{onMessageReceived: make(chan int, 10)}
 }
 
 //Start start server on the given port.
-func (s *ServerService) Start(port int) {
+func (s *Service) Start(port int) {
 	fmt.Println("Starting server")
 	connectionMap = make(map[int]Connection)
 
@@ -46,7 +47,7 @@ func (s *ServerService) Start(port int) {
 }
 
 //WaitForMessage test function to see how channels work.
-func (s *ServerService) WaitForMessage() {
+func (s *Service) WaitForMessage() {
 	fmt.Println("Waiting for value")
 	value := <-s.onMessageReceived
 
