@@ -1,4 +1,4 @@
-package read
+package interpreter
 
 import (
 	"github.com/golang/protobuf/proto"

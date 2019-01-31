@@ -7,9 +7,8 @@ import (
 	"net"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/project-quiz/quiz-go-model/model"
-	"github.com/project-quiz/quiz-server/read"
+	"github.com/project-quiz/quiz-server/interpreter"
 	"github.com/twinj/uuid"
 )
 
@@ -48,24 +47,38 @@ func Read(index int, server *Service, connection Connection) {
 
 	for scanner.Scan() {
 		bytes := scanner.Bytes()
-		m, err := read.ReadBaseMessage(bytes)
+		m, err := interpreter.ReadBaseMessage(bytes)
 
-		fmt.Println(m.Message.TypeUrl)
-
-		//TODO: create a generic way of unmarshiling types.
-		playerJoin := model.PlayerJoin{}
-		err2 := ptypes.UnmarshalAny(m.Message, &playerJoin)
-
-		if err != nil || err2 != nil {
-			fmt.Println(err2.Error())
+		if err != nil {
+			fmt.Println("Error reading base message: ", err.Error())
 			break
 		} else {
-			p := &connection.player
-			p.Nickname = playerJoin.Nickname
-			server.onMessageReceived <- 5
-			//Only write to the client that is connecting.
-			WriteSingle(index, &model.PlayerJoined{Guid: connection.player.Guid, Player: &connection.player})
+			//send combined Result message (so the connection is linked to the message)
+			server.onMessageReceived <- Result{Message: m, Connection: connection}
 		}
+
+		fmt.Println("Waiting for next message")
+
+		/*
+			playerJoin := model.PlayerJoin{}
+			err2 := ptypes.UnmarshalAny(m.Message, &playerJoin)
+
+			if err != nil || err2 != nil {
+				fmt.Println("Read base message ", err2.Error())
+				break
+			} else {
+			}
+				if err != nil || err2 != nil {
+					fmt.Println(err2.Error())
+					break
+				} else {
+					p := &connection.player
+					p.Nickname = playerJoin.Nickname
+					//Only write to the client that is connecting.
+					WriteSingle(index, &model.PlayerJoined{Guid: connection.player.Guid, Player: &connection.player})
+				}
+				server.onMessageReceived <- m
+		*/
 		//c.Server.onNewMessage(c, strings.ToUpper(hex.EncodeToString(scanner.Bytes())+"0d0a"))
 	}
 
@@ -108,7 +121,7 @@ func Write(indexes []int, message proto.Message) {
 
 //WriteWithIndex internal use only! To connection with the index and a proto message interface
 func WriteWithIndex(index int, messageIndex int32, message proto.Message) {
-	bytes, err := read.WriteBaseMessage(message)
+	bytes, err := interpreter.WriteBaseMessage(message)
 
 	if err != nil {
 		fmt.Println("WriteWithIndex: ", err.Error())

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/project-quiz/quiz-server/database"
 	"github.com/project-quiz/quiz-server/server"
 )
@@ -13,11 +15,10 @@ func main() {
 	go db.TestDBCon(err)
 
 	server := server.New()
-	go server.Start(4500)
 
-	for {
-		if stop {
-			break
-		}
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go server.Start(4500, &wg)
+
+	wg.Wait()
 }
