@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/project-quiz/quiz-go-model/model"
-	"github.com/project-quiz/quiz-server/channels"
+	"github.com/project-quiz/quiz-server/service"
 )
 
 var connectionMap map[int]Connection
@@ -19,14 +19,14 @@ type Result struct {
 
 //Service this service contains all code to start an tcp server on the given port create with server.New() and then call func start with port to start it.
 type Service struct {
-	Channels          *channels.Channels
+	Channels          *service.ChannelService
 	connected         bool
 	onMessageReceived chan Result
 }
 
 //New create new server service with onMessageReceived channel
-func New() Service {
-	return Service{onMessageReceived: make(chan Result, 10), Channels: channels.Instance()}
+func New(channelService *service.ChannelService) Service {
+	return Service{onMessageReceived: make(chan Result, 10), Channels: channelService}
 }
 
 //Start start server on the given port.
