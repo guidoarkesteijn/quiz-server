@@ -5,20 +5,23 @@ import (
 
 	"github.com/project-quiz/quiz-server/database"
 	"github.com/project-quiz/quiz-server/server"
+	"github.com/project-quiz/quiz-server/service"
 )
 
-var stop bool
-
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	channelService := service.NewChannelService()
+
+	gameService := service.NewGameService(channelService)
+	go gameService.ListenToJoinGame()
+
+	server := server.New(channelService)
+	go server.Start(4500, &wg)
 
 	db, err := database.New()
 	go db.TestDBCon(err)
-
-	server := server.New()
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go server.Start(4500, &wg)
 
 	wg.Wait()
 }
