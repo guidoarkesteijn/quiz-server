@@ -1,16 +1,19 @@
 package service
 
-import "github.com/project-quiz/quiz-server/message"
+import (
+	"github.com/project-quiz/quiz-go-model/model"
+)
 
 //ChannelService contains all channels for communication inside the server.
 type ChannelService struct {
-	SendMessageHandler chan message.SendMessage
+	JoinGame   chan model.JoinGame
+	GameJoined chan model.GameJoined
 }
 
-//ChannelService Creates a new ChannelService
+//NewChannelService Creates a new ChannelService
 func NewChannelService() *ChannelService {
-	return &ChannelService{}
-}
-
-func (cs ChannelService) Subscribe() {
+	channelService := ChannelService{}
+	channelService.JoinGame = make(chan model.JoinGame, 5)
+	channelService.GameJoined = make(chan model.GameJoined, 5)
+	return &channelService
 }

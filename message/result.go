@@ -5,6 +5,6 @@ import (
 )
 
 type Result struct {
-	Message    model.BaseMessage
-	Connection Connection
+	Message    *model.BaseMessage
+	Connection *Connection
 }

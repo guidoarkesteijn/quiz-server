@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/project-quiz/quiz-server/database"
@@ -10,20 +9,19 @@ import (
 )
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	channelService := service.NewChannelService()
 
 	gameService := service.NewGameService(channelService)
+	go gameService.ListenToJoinGame()
 
-	fmt.Println(gameService)
+	server := server.New(channelService)
+	go server.Start(4500, &wg)
 
 	db, err := database.New()
 	go db.TestDBCon(err)
-
-	server := server.New(channelService)
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go server.Start(4500, &wg)
 
 	wg.Wait()
 }

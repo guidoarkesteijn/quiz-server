@@ -33,7 +33,7 @@ func New() (*DatabaseService, error) {
 	db, err := sql.Open("mysql", connection)
 
 	if err != nil {
-		fmt.Println("err" + err.Error())
+		fmt.Println("[DataBase] err" + err.Error())
 		return nil, err
 	}
 
@@ -46,7 +46,7 @@ func (service *DatabaseService) GetQuestion(guid string) {
 	Result, errDB := service.database.Query("SELECT guid,text FROM questions WHERE guid='" + guid + "'")
 
 	if errDB != nil {
-		fmt.Println("Error" + errDB.Error())
+		fmt.Println("[DataBase] Error" + errDB.Error())
 	}
 
 	for Result.Next() {
@@ -67,7 +67,7 @@ func (service *DatabaseService) GetQuestions() (questions []model.Question, err 
 	Result, err := service.database.Query("SELECT guid,text FROM questions")
 
 	if err != nil {
-		fmt.Println("Question error: " + err.Error())
+		fmt.Println("[DataBase] Question error: " + err.Error())
 	}
 
 	q := []model.Question{}
@@ -84,7 +84,7 @@ func (service *DatabaseService) GetQuestions() (questions []model.Question, err 
 		a, answerErr := service.GetAnswers(guid)
 
 		if answerErr != nil {
-			fmt.Println("Answer err for question " + guid + ": " + answerErr.Error())
+			fmt.Println("[DataBase] Answer err for question " + guid + ": " + answerErr.Error())
 		}
 
 		question := model.Question{Guid: guid, Question: text, Answers: a}
@@ -118,21 +118,20 @@ func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*mode
 func (service *DatabaseService) TestDBCon(err error) {
 
 	if err != nil {
-		fmt.Println("error: ", err.Error())
+		fmt.Println("[DataBase] error: ", err.Error())
 	} else {
 		questions, questionErr := service.GetQuestions()
 
 		if questionErr != nil {
-			fmt.Println("error: " + questionErr.Error())
+			fmt.Println("[DataBase] error: " + questionErr.Error())
 		}
 
 		for _, element := range questions {
-			fmt.Println("Question:", element.Question)
-			fmt.Println("Answers:")
+			fmt.Println("[DataBase] Question:", element.Question)
+			fmt.Println("[DataBase] Answers:")
 			for _, answer := range element.Answers {
-				fmt.Println(answer.Text)
+				fmt.Println("[DataBase]", answer.Text)
 			}
 		}
 	}
-
 }
