@@ -9,7 +9,7 @@ import (
 
 	//Use _ because it is needed for mysql driver to be imported.
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/project-quiz/quiz-go-model/model"
+	"github.com/project-quiz/quiz-go-model/message"
 )
 
 type DatabaseService struct {
@@ -63,14 +63,14 @@ func (service *DatabaseService) GetQuestion(guid string) {
 }
 
 //GetQuestions Get all questions from the database.
-func (service *DatabaseService) GetQuestions() (questions []model.Question, err error) {
+func (service *DatabaseService) GetQuestions() (questions []message.Question, err error) {
 	Result, err := service.database.Query("SELECT guid,text FROM questions")
 
 	if err != nil {
 		fmt.Println("[DataBase] Question error: " + err.Error())
 	}
 
-	q := []model.Question{}
+	q := []message.Question{}
 
 	for Result.Next() {
 		var (
@@ -87,17 +87,17 @@ func (service *DatabaseService) GetQuestions() (questions []model.Question, err 
 			fmt.Println("[DataBase] Answer err for question " + guid + ": " + answerErr.Error())
 		}
 
-		question := model.Question{Guid: guid, Question: text, Answers: a}
+		question := message.Question{Guid: guid, Question: text, Answers: a}
 		q = append(q, question)
 	}
 
 	return q, err
 }
 
-func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*model.Answer, err error) {
+func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*message.Answer, err error) {
 	Result, err := service.database.Query("SELECT guid,answer FROM answers WHERE question='" + questionGuid + "'")
 
-	a := []*model.Answer{}
+	a := []*message.Answer{}
 
 	for Result.Next() {
 		var (
@@ -107,7 +107,7 @@ func (service *DatabaseService) GetAnswers(questionGuid string) (answers []*mode
 		if err := Result.Scan(&guid, &answer); err != nil {
 			log.Fatal(err)
 		}
-		obj := model.Answer{Guid: guid, Text: answer}
+		obj := message.Answer{Guid: guid, Text: answer}
 
 		a = append(a, &obj)
 	}

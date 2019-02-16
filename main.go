@@ -3,6 +3,7 @@ package main
 import (
 	"sync"
 
+	"github.com/project-quiz/quiz-server/channel"
 	"github.com/project-quiz/quiz-server/database"
 	"github.com/project-quiz/quiz-server/server"
 	"github.com/project-quiz/quiz-server/service"
@@ -12,7 +13,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	channelService := service.NewChannelService()
+	channelService := channel.NewChannelService()
 
 	gameService := service.NewGameService(channelService)
 	go gameService.ListenToJoinGame()

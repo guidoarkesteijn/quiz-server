@@ -6,23 +6,24 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/project-quiz/quiz-go-model/model"
-	"github.com/project-quiz/quiz-server/message"
-	"github.com/project-quiz/quiz-server/service"
+	"github.com/project-quiz/quiz-go-model/message"
+	"github.com/project-quiz/quiz-server/channel"
+	"github.com/project-quiz/quiz-server/model"
 )
 
-var connectionMap map[int]message.Connection
+var playerClientList map[string]model.PlayerClient
 
 //Service this service contains all code to start an tcp server on the given port create with server.New() and then call func start with port to start it.
 type Service struct {
-	Channels          *service.ChannelService
+	Channels          *channel.ChannelService
 	connected         bool
-	onMessageReceived chan message.Result
+	onMessageReceived chan model.Result
 }
 
 //New create new server service with onMessageReceived channel
-func New(channelService *service.ChannelService) Service {
-	return Service{onMessageReceived: make(chan message.Result, 10), Channels: channelService}
+func New(channelService *channel.ChannelService) Service {
+	playerClientList = make(map[string]model.PlayerClient)
+	return Service{onMessageReceived: make(chan model.Result, 10), Channels: channelService}
 }
 
 //Start server on the given port.
@@ -30,7 +31,6 @@ func (s *Service) Start(port int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	fmt.Println("Starting server")
-	connectionMap = make(map[int]message.Connection)
 
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 
@@ -68,18 +68,18 @@ func (s *Service) WaitForMessage() {
 			fmt.Println("error getting any message name:", err.Error())
 		} else {
 			switch v := dynamic.Message.(type) {
-			case *model.PlayerJoin:
-				player := result.Connection.Player
-				player.Nickname = v.Nickname
-				WriteSingle(result.Connection.Index, &model.PlayerJoined{Guid: player.Guid, Player: player})
-			case *model.JoinGame:
+			case *message.PlayerJoin:
+				player := result.PlayerClient
+				player.NickName = v.Nickname
+				player.WriteMessage(&message.PlayerJoined{Guid: player.Guid, Player: player.ToProto()})
+			case *message.JoinGame:
 				fmt.Println("player wants to join game:", v.Player.Nickname)
 				channelService := *s.Channels
 				channelService.JoinGame <- *v
 
 				value := <-s.Channels.GameJoined
 				fmt.Println("found game:", value)
-				WriteSingle(result.Connection.Index, &model.GameJoined{})
+				result.PlayerClient.WriteMessage(&message.GameJoined{})
 			default:
 				fmt.Printf("I don't know about this message type. %T!\n", v)
 			}

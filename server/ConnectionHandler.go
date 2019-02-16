@@ -6,30 +6,32 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/project-quiz/quiz-go-model/model"
+	"github.com/project-quiz/quiz-go-model/message"
+
 	"github.com/project-quiz/quiz-server/interpreter"
-	"github.com/project-quiz/quiz-server/message"
+	"github.com/project-quiz/quiz-server/model"
 	"github.com/twinj/uuid"
 )
 
-var i = 0
 var messageCount int32 = 1
 
 //HandleConnection handle incoming connection.
 func HandleConnection(server *Service, c net.Conn) {
-	player := model.Player{Guid: uuid.NewV4().String(), Nickname: "<UNKNOWN>"}
-	connection := message.Connection{Player: &player, Index: i, Con: c}
+	connection := model.PlayerClient{Guid: uuid.NewV4().String(), NickName: "<UNKNOWN>", Con: c}
 
-	connectionMap[i] = connection
-	go Read(i, server, &connection)
+	playerClientList[connection.Guid] = connection
+	go Read(server, &connection)
 
-	fmt.Println("Added connection number:" + fmt.Sprintf("%d", connection.Index))
-	i++
+	fmt.Println("Added connection number:" + fmt.Sprintf("%d", len(playerClientList)))
+}
+
+func ToPlayerClient(m *message.Player) model.PlayerClient {
+	return playerClientList[m.Guid]
 }
 
 //Read reading from the connection.
-func Read(index int, server *Service, connection *message.Connection) {
+func Read(server *Service, connection *model.PlayerClient) {
+	guid := connection.Guid
 	c := connection.Con
 
 	fmt.Printf("Serving %s\n", c.RemoteAddr().String())
@@ -47,14 +49,14 @@ func Read(index int, server *Service, connection *message.Connection) {
 			break
 		} else {
 			//send combined Result message (so the connection is linked to the message)
-			server.onMessageReceived <- message.Result{Message: &m, Connection: connection}
+			server.onMessageReceived <- model.Result{Message: &m, PlayerClient: connection}
 		}
 
 		fmt.Println("Waiting for next message")
 	}
 
 	fmt.Println("Close: ", c.RemoteAddr().String())
-	DeleteConnection(index)
+	DeleteConnection(guid)
 	c.Close()
 }
 
@@ -76,33 +78,7 @@ func scanCRLF(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return 0, nil, nil
 }
 
-//WriteSingle write to one single
-func WriteSingle(index int, message proto.Message) {
-	indexes := []int{index}
-	Write(indexes, message)
-}
-
-//Write write to the given indexes
-func Write(indexes []int, message proto.Message) {
-	for index := 0; index < len(indexes); index++ {
-		WriteWithIndex(indexes[index], messageCount, message)
-	}
-	messageCount++
-}
-
-//WriteWithIndex internal use only! To connection with the index and a proto message interface
-func WriteWithIndex(index int, messageIndex int32, message proto.Message) {
-	bytes, err := interpreter.WriteBaseMessage(message)
-
-	if err != nil {
-		fmt.Println("WriteWithIndex: ", err.Error())
-	} else {
-		//write to the correct connection.
-		connectionMap[index].Con.Write(bytes)
-	}
-}
-
 //DeleteConnection delete the given index from the connection map.
-func DeleteConnection(index int) {
-	delete(connectionMap, index)
+func DeleteConnection(guid string) {
+	delete(playerClientList, guid)
 }

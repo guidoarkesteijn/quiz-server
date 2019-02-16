@@ -1,13 +1,13 @@
 package game
 
 import (
-	"github.com/project-quiz/quiz-go-model/model"
+	"github.com/project-quiz/quiz-server/model"
 	"github.com/twinj/uuid"
 )
 
 type Game struct {
 	Guid    string
-	Players []*model.Player
+	Players []*model.PlayerClient
 }
 
 //New Create new game
@@ -16,6 +16,6 @@ func New() (g Game) {
 	return g
 }
 
-func (g *Game) AddPlayer(player *model.Player) {
+func (g *Game) AddPlayer(player *model.PlayerClient) {
 	g.Players = append(g.Players, player)
 }

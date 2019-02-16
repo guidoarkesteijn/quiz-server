@@ -3,21 +3,21 @@ package interpreter
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
-	"github.com/project-quiz/quiz-go-model/model"
+	"github.com/project-quiz/quiz-go-model/message"
 )
 
 //ReadBaseMessage reads the bytes to a base message.
-func ReadBaseMessage(bytes []byte) (model.BaseMessage, error) {
-	message := model.BaseMessage{}
+func ReadBaseMessage(bytes []byte) (message.BaseMessage, error) {
+	message := message.BaseMessage{}
 	err := proto.Unmarshal(bytes, &message)
 	return message, err
 }
 
 //WriteBaseMessage writes a proto message inside an base message's any field and returns the marshaled bytes or nil when error occurs.
-func WriteBaseMessage(message proto.Message) ([]byte, error) {
+func WriteBaseMessage(m proto.Message) ([]byte, error) {
 	//get name for any field.
-	name := proto.MessageName(message)
-	serialized, err := proto.Marshal(message)
+	name := proto.MessageName(m)
+	serialized, err := proto.Marshal(m)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func WriteBaseMessage(message proto.Message) ([]byte, error) {
 		Value:   serialized,
 	}
 
-	baseMessage := model.BaseMessage{Message: anything}
+	baseMessage := message.BaseMessage{Message: anything}
 	bytes, seconderr := proto.Marshal(&baseMessage)
 
 	if seconderr != nil {

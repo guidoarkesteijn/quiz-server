@@ -3,8 +3,10 @@ package service
 import (
 	"fmt"
 
-	"github.com/project-quiz/quiz-go-model/model"
+	"github.com/project-quiz/quiz-server/channel"
+	"github.com/project-quiz/quiz-server/server"
 
+	"github.com/project-quiz/quiz-go-model/message"
 	"github.com/project-quiz/quiz-server/game"
 )
 
@@ -12,12 +14,12 @@ const maxPlayersPerGame = 2
 
 //GameService keeps track of all the running games.
 type GameService struct {
-	Channels *ChannelService
+	Channels *channel.ChannelService
 	games    map[string]game.Game
 }
 
 //NewGameService Creates new GameSerice.
-func NewGameService(channelService *ChannelService) *GameService {
+func NewGameService(channelService *channel.ChannelService) *GameService {
 	gameService := GameService{Channels: channelService}
 	gameService.games = make(map[string]game.Game)
 	return &gameService
@@ -35,13 +37,15 @@ func (gs *GameService) ListenToJoinGame() {
 	}
 }
 
-func (gs *GameService) OnJoinGame(joinGame *model.JoinGame) {
+func (gs *GameService) OnJoinGame(joinGame *message.JoinGame) {
 	fmt.Println("Finding game for player that wants to join")
 	game := gs.FindAvaiableGame()
-	game.AddPlayer(joinGame.Player)
+	player := server.ToPlayerClient(joinGame.Player)
+
+	game.AddPlayer(&player)
 
 	fmt.Println("Found and added player to game:", game.Guid)
-	gs.Channels.GameJoined <- model.GameJoined{}
+	gs.Channels.GameJoined <- message.GameJoined{}
 }
 
 //findAvaiableGame should never return nil because a new game is created when all games are full.
