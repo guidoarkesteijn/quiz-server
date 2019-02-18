@@ -3,10 +3,10 @@ package service
 import (
 	"fmt"
 
-	"github.com/project-quiz/quiz-server/channel"
-	"github.com/project-quiz/quiz-server/server"
+	"github.com/project-quiz/quiz-server/model"
 
-	"github.com/project-quiz/quiz-go-model/message"
+	"github.com/project-quiz/quiz-server/channel"
+
 	"github.com/project-quiz/quiz-server/game"
 )
 
@@ -37,25 +37,20 @@ func (gs *GameService) ListenToJoinGame() {
 	}
 }
 
-func (gs *GameService) OnJoinGame(joinGame *message.JoinGame) {
-	fmt.Println("Finding game for player that wants to join")
-	game := gs.FindAvaiableGame()
-	player := server.ToPlayerClient(joinGame.Player)
-
-	game.AddPlayer(&player)
-
-	fmt.Println("Found and added player to game:", game.Guid)
-	gs.Channels.GameJoined <- message.GameJoined{}
+func (gs *GameService) OnJoinGame(player *model.PlayerClient) {
+	game := gs.FindAvailableGame()
+	game.AddPlayer(player)
+	gs.Channels.GameJoined <- *game
 }
 
 //findAvaiableGame should never return nil because a new game is created when all games are full.
-func (gs *GameService) FindAvaiableGame() game.Game {
+func (gs *GameService) FindAvailableGame() *game.Game {
 	for element := range gs.games {
 		game := gs.games[element]
 
 		fmt.Println(len(game.Players))
 		if len(game.Players) < maxPlayersPerGame {
-			return game
+			return &game
 		}
 
 		fmt.Println("no empty game found create new game")
@@ -65,7 +60,7 @@ func (gs *GameService) FindAvaiableGame() game.Game {
 
 	gs.games[game.Guid] = game
 
-	return game
+	return &game
 }
 
 //Get get the specific game back with the matching guid given.

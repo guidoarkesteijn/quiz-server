@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/project-quiz/quiz-server/interpreter"
@@ -26,6 +27,8 @@ func (p *PlayerClient) WriteMessage(message proto.Message) {
 
 	if err == nil {
 		p.Write(bytes)
+	} else {
+		fmt.Println("Error sending:", err.Error())
 	}
 }
 

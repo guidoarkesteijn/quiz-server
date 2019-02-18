@@ -68,18 +68,21 @@ func (s *Service) WaitForMessage() {
 			fmt.Println("error getting any message name:", err.Error())
 		} else {
 			switch v := dynamic.Message.(type) {
+			case *message.JoinServer:
+				fmt.Println("Player joins server. Welcome!")
+				player := result.PlayerClient
+				player.WriteMessage(&message.ServerJoined{Player: player.ToProto()})
+			case *message.JoinGame:
+				fmt.Println("player wants to join game:", v.Player.Nickname)
+				channelService := *s.Channels
+				channelService.JoinGame <- *result.PlayerClient
+				value := <-s.Channels.GameJoined
+				fmt.Println("Found game:", value)
+				result.PlayerClient.WriteMessage(&message.GameJoined{GUID: value.Guid, Players: value.ToProto()})
 			case *message.PlayerJoin:
 				player := result.PlayerClient
 				player.NickName = v.Nickname
 				player.WriteMessage(&message.PlayerJoined{Guid: player.Guid, Player: player.ToProto()})
-			case *message.JoinGame:
-				fmt.Println("player wants to join game:", v.Player.Nickname)
-				channelService := *s.Channels
-				channelService.JoinGame <- *v
-
-				value := <-s.Channels.GameJoined
-				fmt.Println("found game:", value)
-				result.PlayerClient.WriteMessage(&message.GameJoined{})
 			default:
 				fmt.Printf("I don't know about this message type. %T!\n", v)
 			}
