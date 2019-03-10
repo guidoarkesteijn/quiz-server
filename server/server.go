@@ -50,6 +50,7 @@ func (s *Service) Start(port int, wg *sync.WaitGroup) {
 			return
 		}
 		s.connected = true
+
 		go s.WaitForMessage()
 		HandleConnection(s, c)
 	}
@@ -73,11 +74,13 @@ func (s *Service) WaitForMessage() {
 				player := result.PlayerClient
 				player.WriteMessage(&message.ServerJoined{Player: player.ToProto()})
 			case *message.JoinGame:
+				result.PlayerClient.NickName = v.Player.Nickname
 				fmt.Println("player wants to join game:", v.Player.Nickname)
 				channelService := *s.Channels
 				channelService.JoinGame <- *result.PlayerClient
 				value := <-s.Channels.GameJoined
 				fmt.Println("Found game:", value)
+				fmt.Println("Player count:", len(value.Players))
 				result.PlayerClient.WriteMessage(&message.GameJoined{GUID: value.Guid, Players: value.ToProto()})
 			case *message.PlayerJoin:
 				player := result.PlayerClient

@@ -56,7 +56,7 @@ func Read(server *Service, connection *model.PlayerClient) {
 	}
 
 	fmt.Println("Close: ", c.RemoteAddr().String())
-	DeleteConnection(guid)
+	DeleteConnection(server, guid)
 	c.Close()
 }
 
@@ -79,6 +79,7 @@ func scanCRLF(data []byte, atEOF bool) (advance int, token []byte, err error) {
 }
 
 //DeleteConnection delete the given index from the connection map.
-func DeleteConnection(guid string) {
+func DeleteConnection(server *Service, guid string) {
+	server.Channels.LeaveGame <- playerClientList[guid]
 	delete(playerClientList, guid)
 }

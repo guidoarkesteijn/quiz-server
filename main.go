@@ -17,6 +17,7 @@ func main() {
 
 	gameService := service.NewGameService(channelService)
 	go gameService.ListenToJoinGame()
+	go gameService.ListenToLeaveGame()
 
 	server := server.New(channelService)
 	go server.Start(4500, &wg)

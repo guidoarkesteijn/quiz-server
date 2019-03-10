@@ -9,6 +9,7 @@ import (
 type ChannelService struct {
 	JoinGame   chan model.PlayerClient
 	GameJoined chan game.Game
+	LeaveGame  chan model.PlayerClient
 }
 
 //NewChannelService Creates a new ChannelService
@@ -16,5 +17,6 @@ func NewChannelService() *ChannelService {
 	channelService := ChannelService{}
 	channelService.JoinGame = make(chan model.PlayerClient, 5)
 	channelService.GameJoined = make(chan game.Game, 5)
+	channelService.LeaveGame = make(chan model.PlayerClient, 5)
 	return &channelService
 }
