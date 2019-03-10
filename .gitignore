@@ -12,5 +12,6 @@
 *.out
 
 # VSCode
-.vs/
-.vscode/
+.vs/*
+.vscode/*
+!.vscode/tasks.json
